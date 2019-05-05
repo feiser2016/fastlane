@@ -33,6 +33,7 @@ describe Fastlane do
             binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
             workspace: 'foo.xcworkspace',
+            arch: 'arm64',
             source_files: '#{source_files}',
             decimals: '2'
           })
@@ -64,6 +65,7 @@ describe Fastlane do
                     --binary-file you
                     --binary-basename YourApp
                     --binary-basename YourFramework
+                    --arch arm64
                     --source-files #{source_files.shellescape}
                     --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
@@ -185,6 +187,22 @@ describe Fastlane do
                     --scheme #{scheme.shellescape}
                     #{proj.shellescape}".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
+      end
+
+      it "works with when binary_file is set to true or false" do
+        possible_values = ["true", "false"]
+        expected = "slather coverage foo.xcodeproj".gsub(/\s+/, ' ')
+
+        possible_values.each do |value|
+          result = Fastlane::FastFile.new.parse("lane :test do
+            slather({
+              binary_file: #{value},
+              proj: 'foo.xcodeproj'
+            })
+          end").runner.execute(:test)
+
+          expect(result).to eq(expected)
+        end
       end
 
       it "works with multiple ignore patterns" do
